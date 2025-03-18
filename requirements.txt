@@ -1,0 +1,9 @@
+matplotlib
+pandas
+langchain
+langchain-community
+uvicorn
+fastapi
+python-dotenv
+langgraph
+pillow
