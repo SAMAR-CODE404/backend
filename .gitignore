@@ -1,3 +1,5 @@
 .env
 utils/__pycache__
 venv/*
+agents/__pycache__
+tools/__pycache__
