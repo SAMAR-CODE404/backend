@@ -3,3 +3,7 @@ utils/__pycache__
 venv/*
 agents/__pycache__
 tools/__pycache__
+RAG/__pycache__
+*.pdf
+dc.txt
+chroma_db/*

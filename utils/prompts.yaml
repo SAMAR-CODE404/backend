@@ -1,0 +1,8 @@
+RAG_prompts:
+  human_message: |
+        Answer the question based only on the following context information.
+        CONTEXT:
+        ${context}
+        QUESTION:
+        ${query_text}
+        ANSWER:

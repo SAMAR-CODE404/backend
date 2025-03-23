@@ -8,3 +8,9 @@ python-dotenv
 langchain-groq
 langgraph
 pillow
+llama-index
+llama-index-embeddings-langchain
+llama-index-vector-stores-chroma
+langchain-chroma>=0.1.2
+chromadb
+sentence-transformers
