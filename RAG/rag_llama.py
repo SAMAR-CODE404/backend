@@ -5,7 +5,7 @@ import os
 from typing import List, Dict, Any
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
-from utils.chat import invoke_llm_langchain
+from utils.chat import Chat
 import yaml
 from llama_index.core import VectorStoreIndex
 from llama_index.core import Settings
@@ -138,9 +138,10 @@ class RAG:
         context = "\n\n".join(context_parts)
         prompt = self.prompts['human_message'].format(query_text=query_text, context=context)
         logger.debug(f"Generated prompt with context from {len(context_parts)} documents")
-        messages = [HumanMessage(content=prompt)]
+        message = [HumanMessage(content=prompt)]
         logger.info("Invoking LLM for response generation")
-        updated_messages, input_tokens, output_tokens = invoke_llm_langchain(messages)
+        llm = Chat()
+        updated_messages, input_tokens, output_tokens = llm.invoke_llm_langchain(messages= message)
         logger.info(f"Generated response: {input_tokens} input tokens, {output_tokens} output tokens")
         
         return {
@@ -154,7 +155,7 @@ class RAG:
 
 if __name__ == "__main__":
     text_path = "/home/naba/Desktop/backend/RIL-Integrated-Annual-Report-2023-24_parsed.txt"
-    logger.info(f"Starting RAG application with PDF: {text_path}")
+    logger.info(f"Starting RAG application with document: {text_path}")
     rag = RAG(text_path)
     index = rag.create_db()
     retriever = rag.create_retriever(index)
