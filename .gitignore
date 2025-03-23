@@ -7,3 +7,5 @@ RAG/__pycache__
 *.pdf
 dc.txt
 chroma_db/*
+*_parsed.txt
+parser/__pycache__

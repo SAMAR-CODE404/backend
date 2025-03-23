@@ -14,3 +14,5 @@ llama-index-vector-stores-chroma
 langchain-chroma>=0.1.2
 chromadb
 sentence-transformers
+pyMuPDF
+pytesseract
