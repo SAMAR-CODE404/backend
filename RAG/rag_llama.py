@@ -21,17 +21,14 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 class RAG:
-    def __init__(self, pdf_path):
-        logger.info(f"Initializing RAG with PDF: {pdf_path}")
-        # self.parser = ResearchPaperParser(pdf_path, output_dir="output", save=False) 
-        # self.text = self.parser.process_document()['text']
-        text_file_path = "/home/naba/Desktop/backend/dc.txt" #using this for dev purpose only
+    def __init__(self, text_path):
+        logger.info(f"Initializing RAG with text: {text_path}")
         try:
-            with open(text_file_path, 'r') as file:
+            with open(text_path, 'r') as file:
                 text_content = file.read()
             self.text = text_content
         except FileNotFoundError:
-            logger.error(f"Text file not found at {text_file_path}")
+            logger.error(f"Text file not found at {text_path}")
             self.text = None
 
         logger.info(f"Successfully loaded document text")
@@ -156,9 +153,9 @@ class RAG:
         }
 
 if __name__ == "__main__":
-    pdf_path = "/home/naba/Desktop/backend/dc.pdf"
+    text_path = "/home/naba/Desktop/backend/dc.txt"
     logger.info(f"Starting RAG application with PDF: {pdf_path}")
-    rag = RAG(pdf_path)
+    rag = RAG(text_path)
     index = rag.create_db()
     retriever = rag.create_retriever(index)
     while(input("Enter 'q' to quit: ") != 'q'):
