@@ -153,8 +153,8 @@ class RAG:
         }
 
 if __name__ == "__main__":
-    text_path = "/home/naba/Desktop/backend/dc.txt"
-    logger.info(f"Starting RAG application with PDF: {pdf_path}")
+    text_path = "/home/naba/Desktop/backend/RIL-Integrated-Annual-Report-2023-24_parsed.txt"
+    logger.info(f"Starting RAG application with PDF: {text_path}")
     rag = RAG(text_path)
     index = rag.create_db()
     retriever = rag.create_retriever(index)
