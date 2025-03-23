@@ -21,17 +21,21 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 class RAG:
-    def __init__(self, text_path):
-        logger.info(f"Initializing RAG with text: {text_path}")
-        try:
-            with open(text_path, 'r') as file:
-                text_content = file.read()
-            self.text = text_content
-        except FileNotFoundError:
-            logger.error(f"Text file not found at {text_path}")
-            self.text = None
+    def __init__(self, text_or_path):
+        logger.info("Initializing RAG")
+        
+        if os.path.isfile(text_or_path):  
+            try:
+                with open(text_or_path, 'r', encoding='utf-8') as file:
+                    self.text = file.read()
+                logger.info(f"Loaded text from file: {text_or_path}")
+            except FileNotFoundError:
+                logger.error(f"Text file not found at {text_or_path}")
+                self.text = None
+        else:
+            self.text = text_or_path
+            logger.info("Loaded text from string input")
 
-        logger.info(f"Successfully loaded document text")
         self.embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
         logger.info("Initialized embedding model: sentence-transformers/all-MiniLM-L6-v2")
         Settings.embed_model = self.embed_model

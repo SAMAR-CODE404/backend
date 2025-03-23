@@ -9,3 +9,4 @@ dc.txt
 chroma_db/*
 *_parsed.txt
 parser/__pycache__
+__pycache__

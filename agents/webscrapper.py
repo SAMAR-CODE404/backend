@@ -8,18 +8,19 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from utils.analyzer_utils import log_node, truncate_text
 from langchain_core.messages import SystemMessage
+from RAG.rag_llama import RAG
+import yaml
 
 class WebScraperNodes:
     def __init__(self, llm):
         self.llm = llm
-        self.system_prompt = """You are a professional financial data analyst.
-                            Your task is to extract relevant financial information from websites and summarize it.
-                            - Extract key financial metrics and data points
-                            - Focus on stock prices, market cap, P/E ratios, revenue, profit margins
-                            - Identify trends in quarterly and annual financial results
-                            - Note analyst opinions and market sentiment
-                            - Organize information in a structured manner with sections
-                            - Include exact numbers and percentages when available"""
+        self.RAG = None
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir) 
+        prompts_path = os.path.join(project_root, "utils", "prompts.yaml")
+        with open(prompts_path, "r") as file:
+            self.prompts = yaml.safe_load(file)["web_scrapper_prompt"]
+        self.system_prompt = self.prompts["system_message"]
     
     @log_node("initialize_scraper")
     def initialize_scraper(self, state):
@@ -102,26 +103,12 @@ class WebScraperNodes:
                 financial_metrics[company_name].update(extracted_data)
             
             # Use LLM to analyze and extract additional insights
-            prompt = f"""Analyze the following financial website content for {company_name or 'the company'}.
-                      
-                      URL: {original_url}
-                      
-                      Extracted financial metrics: {json.dumps(extracted_data, indent=2) if extracted_data else 'None'}
-                      
-                      Website content:
-                      {content_text[:15000]}  # Limiting to 15000 chars
-                      
-                      Please:
-                      1. Extract and highlight any additional important financial metrics
-                      2. Identify key trends and patterns in the financial data
-                      3. Provide context for the financial numbers
-                      4. Summarize the company's financial position based on this data
-                      5. Present information in a clear, structured format with sections"""
-            
-            response = self.llm.invoke([SystemMessage(content=self.system_prompt), SystemMessage(content=prompt)])
-            summary = response.content
-            
-            # Determine the title based on the URL
+            self.RAG = RAG(content_text)
+            index = self.RAG.create_db()
+            retriever = self.RAG.create_retriever(index)
+            prompt = self.prompts['rag_prompt'].format(original_url = original_url, extracted_metrics = json.dumps(extracted_data, indent=2) if extracted_data else 'None')
+            response = self.RAG.rag_query(prompt, retriever)          
+            summary = response["result"]
             title = self._get_title_from_url(original_url)
             
             # Store the scraped data
