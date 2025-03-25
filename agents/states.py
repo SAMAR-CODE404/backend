@@ -1,6 +1,7 @@
 from typing import TypedDict, Dict, List, Any, Optional
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+from RAG.rag_llama import RAG
 
 class WebScraperStateRequired(TypedDict):
     company_name: str
@@ -22,8 +23,6 @@ class MnAagentState(BaseModel):
     search_results_b: List[Dict[str, Any]] = Field(default_factory=list, description="Additional search results for company B")
     current_step: str = Field(default=None, description="Current workflow step")
     error: str = Field(default=None, description="Error message if any step fails")
-    vector_index_a: Any = Field(default=None, description="Vector index for company A")
-    vector_index_b: Any = Field(default=None, description="Vector index for company B")
     fin_report_a: str = Field(default=None, description="Filename of the final report for company A")
     fin_report_b: str = Field(default=None, description="Filename of the final report for company B")
     operations_report_a: str = Field(default=None, description="Filename of the operations report for company A")
@@ -32,4 +31,11 @@ class MnAagentState(BaseModel):
     Legal_report_b: str = Field(default=None, description="Filename of the legal report for company B")
     merger_report: str = Field(default=None, description="Filename of the merger report")
     competition_report: str = Field(default=None, description="Filename of the competition report")
-    
+    prev_step: str = Field(default=None, description="Previous workflow step")
+    rag_instances: Dict[str, RAG] = Field(default_factory=dict, description="RAG instances for each company")
+    indexes: Dict[str, Any] = Field(default_factory=dict, description="Indexes for each company")
+    retrievers: Dict[str, Any] = Field(default_factory=dict, description="Retrievers for each company")
+    queries: List[str] = Field(default_factory=list, description="Queries for each company")
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True  # Add this line
+    )

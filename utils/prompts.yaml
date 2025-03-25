@@ -2,9 +2,9 @@ RAG_prompts:
   human_message: |
         Answer the question based only on the following context information.
         CONTEXT:
-        ${context}
+        {context}
         QUESTION:
-        ${query_text}
+        {query_text}
         ANSWER:
         don't mention things like "from both the document" or "in the document" or "from document [number]"
         don't Hallucinate
@@ -24,8 +24,8 @@ web_scrapper_prompt:
         - Don't Hallucinate
   rag_prompt: |
         Analyze the following financial website content for the company.
-        URL: ${original_url}
-        Extracted financial metrics: ${extracted_metrics}
+        URL: {original_url}
+        Extracted financial metrics: {extracted_metrics}
         Please:
         1. Extract and highlight any additional important financial metrics
         2. Identify key trends and patterns in the financial data
@@ -33,3 +33,37 @@ web_scrapper_prompt:
         4. Summarize the company's financial position based on this data
         5. Present information in a clear, structured format with sections
         don't Hallucinate
+
+Researcher_prompt:
+      system_message: |
+            You are a professional Financial researcher working on a project for .
+            Your task is to find relevant information from research papers and summarize it.
+            - Extract key insights, values, and conclusions
+            - Don't Hallucinate
+      web_Fin_prompt: |
+            {company_name} financial statements site:sec.gov  
+            {company_name} 10-K report site:sec.gov  
+            {company_name} annual report filetype:pdf  
+            {company_name} investor relations  
+            {company_name} revenue growth trend last 5 years  
+            {company_name} EBIT and net income historical data  
+            {company_name} free cash flow last 5 years  
+            {company_name} cash flow statement site:sec.gov  
+            {company_name} capital expenditures trend  
+            {company_name} working capital changes  
+            {company_name} beta value Yahoo Finance  
+            {company_name} stock beta Bloomberg  
+            US 10-year treasury bond yield today  
+            India risk-free rate
+            historical market risk premium by country  
+            {company_name} interest expense latest quarter  
+            {company_name} average borrowing rate  
+            {company_name} credit rating Moody’s/S&P   
+            {company_name} market capitalization  
+            {company_name} total debt  
+            {company_name} debt-to-equity ratio  
+            {company_name} effective tax rate   
+            {company_name} historical P/E, P/B, EV/EBITDA  
+            {company_name} revenue growth projection  
+            {company_name} cost of capital historical range  
+            {company_name} FCF sensitivity analysis  

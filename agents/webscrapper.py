@@ -271,7 +271,7 @@ class WebScraperNodes:
         # Return the extracted data and the original JSON as text for the LLM to analyze
         return extracted_data, json.dumps(data, indent=2)
     
-    def _format_large_number(self, number):
+    def _format_large_number(self, number): #hardcode asshole
         """Format large numbers in a readable way (K, M, B)."""
         if number >= 1_000_000_000:
             return f"${number / 1_000_000_000:.2f}B"
