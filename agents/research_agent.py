@@ -109,7 +109,7 @@ class ResearchAgentNodes:
                 db_name=self.company_name, 
                 new_text=response
             )
-        
+        state = self.state
         state.current_step = "web_search"
         return state
 

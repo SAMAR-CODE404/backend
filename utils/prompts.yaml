@@ -67,3 +67,204 @@ Researcher_prompt:
             {company_name} revenue growth projection  
             {company_name} cost of capital historical range  
             {company_name} FCF sensitivity analysis  
+
+
+Fin_Agent_prompt:
+      dcf_prompt: |
+            You are an expert financial analyst performing a **Discounted Cash Flow (DCF) valuation** for {company_name}.  
+            Retrieve the most relevant financial data from the vector database, including:  
+            - Revenue and revenue growth rate  
+            - Operating expenses and margins  
+            - Free Cash Flow (FCF) for the past 5 years  
+            - Weighted Average Cost of Capital (WACC)  
+            - Growth rate projections for the next 5 years  
+            - Terminal value assumptions (e.g., perpetual growth rate or exit multiple)  
+
+            Ensure that the data is extracted from **the most recent and reliable sources** such as **earnings reports, SEC filings (10-K, 10-Q), investor presentations, and analyst reports**.  
+
+            ### **Step 1: Retrieve and Structure the Data**  
+            Format the retrieved data as follows:  
+            Company Name: [Extracted Company Name]
+            Industry: [Extracted Industry]
+            Revenue (last 5 years): [Values]
+            Revenue Growth Rate: [Values]
+            Operating Expenses: [Values]
+            Operating Margins: [Values]
+            Free Cash Flow (FCF) (last 5 years): [Values]
+            Projected Growth Rate: [Values]
+            WACC: [Value]
+            Terminal Value Assumption: [Method + Value]
+
+            If certain data points are missing, **approximate them using industry benchmarks** and clearly mention assumptions.  
+
+            ### **Step 2: Perform DCF Valuation**  
+            Using the retrieved data, **calculate the intrinsic value of the company using DCF methodology** as follows:  
+
+            1. **Forecast Free Cash Flows (FCF)** for the next 5 years using the retrieved growth rate.  
+            2. **Discount future cash flows** to present value using WACC as the discount rate.  
+            3. **Calculate the terminal value** using the Gordon Growth Model (`FCF * (1 + g) / (WACC - g)`) or an exit multiple.  
+            4. **Sum the present values** of all discounted cash flows and terminal value to estimate the total enterprise value (EV).  
+            5. **Adjust for debt and cash** to derive the fair equity value of the company.  
+
+            ### **Step 3: Output the DCF Model Results**  
+            Provide a structured output:  
+
+            Projected Free Cash Flow (Next 5 Years): [Values]
+            Discount Rate (WACC): [Value]
+            Terminal Value: [Value]
+            Enterprise Value (EV): [Value]
+            Net Debt: [Value]
+            Intrinsic Equity Value: [Value]
+            Intrinsic Share Price Estimate: [Value]
+
+            If the intrinsic share price deviates significantly from the current market price, provide insights on whether the company appears **undervalued or overvalued** based on the DCF results.  
+
+            ---
+            **Note:**
+            - **Use the most recent data available** for accurate valuation.
+            - **Avoid Hallucination** and ensure all data is supported by reliable sources.
+            - **Focus on financial metrics** relevant to DCF analysis.
+            - **Provide clear justifications** for any assumptions made in the absence of specific data.
+      
+      financial_ratios_prompt: |
+            You are a financial analyst tasked with analyzing the financial ratios of {company_name}.  
+            Extract the following financial data from the vector database:  
+            - Current Ratio  
+            - Quick Ratio  
+            - Debt-to-Equity Ratio  
+            - Return on Equity (ROE)  
+            - Return on Assets (ROA)  
+            - Gross Margin  
+            - Net Margin  
+            - Asset Turnover Ratio  
+            - Inventory Turnover Ratio  
+            - Days Sales Outstanding (DSO)  
+            - Price-to-Earnings (P/E) Ratio  
+            - Price-to-Book (P/B) Ratio  
+            - Price-to-Sales (P/S) Ratio  
+            - Earnings per Share (EPS)  
+            - Dividend Yield  
+            - Payout Ratio  
+
+            Ensure that the data is extracted from **the most recent and reliable sources** such as **earnings reports, SEC filings (10-K, 10-Q), investor presentations, and analyst reports**.  
+
+            ### **Step 1: Retrieve and Structure the Data**  
+            Format the extracted data as follows:  
+            Company Name: [Extracted Company Name]
+            Industry: [Extracted Industry]
+            Current Ratio: [Value]
+            Quick Ratio: [Value]
+            Debt-to-Equity Ratio: [Value]
+            ROE: [Value]
+            ROA: [Value]
+            Gross Margin: [Value]
+            Net Margin: [Value]
+            Asset Turnover Ratio: [Value]
+            Inventory Turnover Ratio: [Value]
+            DSO: [Value]
+            P/E Ratio: [Value]
+            P/B Ratio: [Value]
+            P/S Ratio: [Value]
+            EPS: [Value]
+            Dividend Yield: [Value]
+            Payout Ratio: [Value]
+
+            If certain ratios are not available, **approximate them using relevant financial data** and clearly mention assumptions.  
+
+            ### **Step 2: Analyze the Ratios**  
+            - **Interpret the ratios** in the context of the company's financial health and performance.  
+            - **Compare the ratios** with industry benchmarks or historical values to identify trends.  
+            - **Highlight any red flags** or areas of strength based on the ratios.  
+            - **Provide insights** on how the ratios impact the company's valuation or investment attractiveness.  
+
+            ### **Step 3: Summarize the Analysis**
+            Provide a structured summary:
+            - **Liquidity Ratios:** [Analysis]
+            - **Profitability Ratios:** [Analysis]
+            - **Efficiency Ratios:** [Analysis]
+            - **Valuation Ratios:** [Analysis]
+            - **Dividend Ratios:** [Analysis]
+            - **Overall Assessment:** [Summary]
+            ---
+            **Note:**
+            - **Use the most recent data available** for accurate analysis.
+            - **Avoid Hallucination** and ensure all data is supported by reliable sources.
+            - **Focus on financial ratios** relevant to the company's performance and valuation.
+      financial_reporting_prompt: |
+            description: Perform a comprehensive financial analysis including DCF valuation and financial ratio analysis for {company_name}.
+            steps:
+            - step: Retrieve and Structure Data
+                  details:
+                  company_info:
+                  - Company Name: [Extracted Name]
+                  - Industry: [Extracted Industry]
+                  dcf_metrics:
+                  - Revenue (last 5 years): [Values]
+                  - Revenue Growth Rate: [Values]
+                  - Operating Expenses: [Values]
+                  - Operating Margins: [Values]
+                  - Free Cash Flow (FCF) (last 5 years): [Values]
+                  - Projected Growth Rate (next 5 years): [Values]
+                  - Weighted Average Cost of Capital (WACC): [Value]
+                  - Terminal Value Assumption: [Method + Value]
+                  financial_ratios:
+                  - Current Ratio: [Value]
+                  - Quick Ratio: [Value]
+                  - Debt-to-Equity Ratio: [Value]
+                  - Return on Equity (ROE): [Value]
+                  - Return on Assets (ROA): [Value]
+                  - Gross Margin: [Value]
+                  - Net Margin: [Value]
+                  - Asset Turnover Ratio: [Value]
+                  - Inventory Turnover Ratio: [Value]
+                  - Days Sales Outstanding (DSO): [Value]
+                  - Price-to-Earnings (P/E) Ratio: [Value]
+                  - Price-to-Book (P/B) Ratio: [Value]
+                  - Price-to-Sales (P/S) Ratio: [Value]
+                  - Earnings per Share (EPS): [Value]
+                  - Dividend Yield: [Value]
+                  - Payout Ratio: [Value]
+
+            - step: Perform DCF Valuation
+                  details:
+                  - Forecast Free Cash Flows (FCF) for the next 5 years using projected growth rate.
+                  - Discount future cash flows to present value using WACC.
+                  - Calculate terminal value using Gordon Growth Model or exit multiple.
+                  - Sum present values of cash flows and terminal value to estimate Enterprise Value (EV).
+                  - Adjust for net debt to derive Intrinsic Equity Value.
+                  - Estimate Intrinsic Share Price and compare with current market price.
+                  output:
+                  - Projected Free Cash Flow (Next 5 Years): [Values]
+                  - Discount Rate (WACC): [Value]
+                  - Terminal Value: [Value]
+                  - Enterprise Value (EV): [Value]
+                  - Net Debt: [Value]
+                  - Intrinsic Equity Value: [Value]
+                  - Intrinsic Share Price Estimate: [Value]
+
+            - step: Financial Ratio Analysis
+                  details:
+                  - Analyze liquidity, profitability, efficiency, valuation, and dividend metrics.
+                  - Compare ratios with industry benchmarks and historical trends.
+                  - Highlight any red flags or strengths.
+                  output:
+                  - Liquidity Position: [Analysis]
+                  - Profitability Trends: [Analysis]
+                  - Operational Efficiency: [Analysis]
+                  - Market Valuation: [Analysis]
+                  - Dividend Strategy: [Analysis]
+                  - Overall Financial Health Assessment: [Summary]
+
+            - step: Final Investment Recommendation
+                  details:
+                  - Determine if the company is a strong investment opportunity, overvalued, or fairly valued.
+                  - Provide justification based on DCF valuation and financial ratio analysis.
+                  output:
+                  - Investment Decision: [Buy/Hold/Sell]
+                  - Supporting Insights: [Justification]
+
+            guidelines:
+            - Use the most recent financial data available.
+            - Avoid hallucination and rely on verifiable sources.
+            - Clearly state assumptions where necessary.
+            - Maintain a structured and professional format for readability.

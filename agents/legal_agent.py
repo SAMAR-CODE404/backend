@@ -24,7 +24,6 @@ class LegalAgentNodes:
             self.company_name = state.company_b_name
 
     def take_legal_document(self):
-        # legal
         pass
     def risk_assessment(self):
         # risk

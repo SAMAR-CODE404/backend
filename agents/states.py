@@ -36,6 +36,8 @@ class MnAagentState(BaseModel):
     indexes: Dict[str, Any] = Field(default_factory=dict, description="Indexes for each company")
     retrievers: Dict[str, Any] = Field(default_factory=dict, description="Retrievers for each company")
     queries: List[str] = Field(default_factory=list, description="Queries for each company")
+    dcf_models: Dict[str, Any] = Field(default_factory=dict, description="Discounted Cash Flow models for each company")
+    financial_ratios: Dict[str, Any] = Field(default_factory=dict, description="Financial ratios for each company")
     model_config = ConfigDict(
         arbitrary_types_allowed=True  # Add this line
     )
