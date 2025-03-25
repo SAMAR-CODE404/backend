@@ -6,6 +6,8 @@ RAG_prompts:
         QUESTION:
         ${query_text}
         ANSWER:
+        don't mention things like "from both the document" or "in the document" or "from document [number]"
+        don't Hallucinate
 
 web_scrapper_prompt:
   system_message: |
@@ -19,6 +21,7 @@ web_scrapper_prompt:
         - Include exact numbers and percentages when available
         - Provide a high-level summary of the company's financial health
         - Use bullet points for key highlights
+        - Don't Hallucinate
   rag_prompt: |
         Analyze the following financial website content for the company.
         URL: ${original_url}
@@ -29,3 +32,4 @@ web_scrapper_prompt:
         3. Provide context for the financial numbers
         4. Summarize the company's financial position based on this data
         5. Present information in a clear, structured format with sections
+        don't Hallucinate
