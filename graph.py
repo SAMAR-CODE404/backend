@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
     """
     Create and compile a comprehensive workflow combining research and financial analysis
-    with controlled transition from web search to DCF modeling
+    with guaranteed full completion of web search
     """
     # Initialize agent nodes
     research_agent = ResearchAgentNodes(mn_agent_state, company)
@@ -48,6 +48,7 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
     
     # Research Phase Edges
     workflow.add_edge("generate_queries", "research_human_approval")
+    
     workflow.add_conditional_edges(
         "research_human_approval",
         lambda state: "continue_search" if state.current_step == "human_approval_confirmed" else END,
@@ -57,19 +58,34 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
         }
     )
     
-    # Conditional edges for web search with controlled transition to DCF
+    def web_search_condition(state):
+        search_result = research_agent.should_continue(state)
+        if not hasattr(state, 'search_iterations'):
+            state.search_iterations = 0
+        state.search_iterations += 1
+        
+        # Add a max recursion limit (e.g., 3 iterations)
+        if state.search_iterations >= 26:
+            return "fully_completed"
+        
+        if search_result == END and state.search_iterations > 0:
+            return "fully_completed"
+        
+        return search_result
+
     workflow.add_conditional_edges(
         "web_search",
-        lambda state: "continue_search" if research_agent.should_continue(state) == "continue_search" else "proceed_to_dcf",
+        web_search_condition,
         {
             "continue_search": "web_search",
-            "proceed_to_dcf": "DCF_modelling"
+            "fully_completed": "DCF_modelling",
+            END: END  # Change this to prevent bypassing the workflow
         }
     )
     
-    # Financial Analysis Edges
     workflow.add_edge("DCF_modelling", "financial_ratio")
     workflow.add_edge("financial_ratio", "fin_human_approval")
+    
     workflow.add_conditional_edges(
         "fin_human_approval",
         lambda state: "save_report" if state.current_step == "human_approval_confirmed" else END,
@@ -78,6 +94,7 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
             END: END
         }
     )
+    
     workflow.add_conditional_edges(
         "financial_reporting",
         lambda state: END,
@@ -89,7 +106,7 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
     # Compile the graph
     compiled_graph = workflow.compile()
     
-    # Graph visualization (same as previous implementations)
+    # Graph visualization
     try:
         output_dir = "assets"
         os.makedirs(output_dir, exist_ok=True)

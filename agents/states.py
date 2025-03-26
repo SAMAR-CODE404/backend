@@ -38,6 +38,9 @@ class MnAagentState(BaseModel):
     queries: List[str] = Field(default_factory=list, description="Queries for each company")
     dcf_models: Dict[str, Any] = Field(default_factory=dict, description="Discounted Cash Flow models for each company")
     financial_ratios: Dict[str, Any] = Field(default_factory=dict, description="Financial ratios for each company")
+    search_iterations: int = Field(default=0, description="Current search iteration")
+    risk_check: Dict[str, Any] = Field(default_factory=dict, description="Risk assessment for each company")
+    antitrust_assessment: Dict[str, Any] = Field(default_factory=dict, description="Antitrust assessment for each company")
     model_config = ConfigDict(
         arbitrary_types_allowed=True  # Add this line
     )
