@@ -25,6 +25,7 @@ class CompAgentNodes:
 
     def market_dominance_checker(self):
         # checks the dominance in the market
+        
         pass
     def market_concentration_calculator(self):
         # Computes Herfindahl-Hirschman Index (HHI) to measure market concentration.

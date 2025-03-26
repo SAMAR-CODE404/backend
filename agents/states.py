@@ -18,6 +18,8 @@ class WebScraperState(WebScraperStateRequired, total=False):
 class MnAagentState(BaseModel):
     company_a_name: str = Field(description="Name of the first company being analyzed")
     company_b_name: str = Field(description="Name of the second company being analyzed")
+    company_a_doc: str = Field(description="Document for company A")
+    company_b_doc: str = Field(description="Document for company B")
     merger_acquisition_details: Dict[str, Any] = Field(default_factory=dict, description="Merger and acquisition details")
     search_results_a: List[Dict[str, Any]] = Field(default_factory=list, description="Additional search results for company A")
     search_results_b: List[Dict[str, Any]] = Field(default_factory=list, description="Additional search results for company B")

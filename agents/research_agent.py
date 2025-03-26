@@ -192,6 +192,8 @@ if __name__ == "__main__":
     initial_state = MnAagentState(
         company_a_name="Reliance_Industries_Limited",
         company_b_name="180_Degree_Consulting",
+        company_a_doc="/home/naba/Desktop/backend/RIL-Integrated-Annual-Report-2023-24_parsed.txt",
+        company_b_doc="/home/naba/Desktop/backend/dc.txt",
         rag_instances=rag_instances,
         indexes=indexes,
         retrievers=retrievers

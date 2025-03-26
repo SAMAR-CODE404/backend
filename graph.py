@@ -19,6 +19,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+from agents.research_agent import ResearchAgentNodes
+from agents.fin_agent import FinAgentNodes
+from agents.legal_agent import LegalAgentNodes
+# from agents.report_agent import ReportAgentNodes
+from agents.states import MnAagentState
+from datetime import datetime
+from langgraph.graph import StateGraph, END
+from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
+import os
+import logging 
+from RAG.rag_llama import RAG
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()  # Log to console
+    ]
+)
+logger = logging.getLogger(__name__)
+
 def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
     """
     Create and compile a comprehensive workflow combining research and financial analysis
@@ -27,6 +48,7 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
     # Initialize agent nodes
     research_agent = ResearchAgentNodes(mn_agent_state, company)
     fin_agent = FinAgentNodes(mn_agent_state, company)
+    legal_agent = LegalAgentNodes(mn_agent_state, company)
     
     # Define the graph workflow
     workflow = StateGraph(MnAagentState)
@@ -42,6 +64,14 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
     workflow.add_node("financial_ratio", fin_agent.financial_ratios)
     workflow.add_node("fin_human_approval", fin_agent.human_approval)
     workflow.add_node("financial_reporting", fin_agent.financial_reporting)
+    
+    # Legal Nodes
+    workflow.add_node("human_give_doc", legal_agent.human_give_doc)
+    workflow.add_node("take_legal_document", legal_agent.take_legal_document)
+    workflow.add_node("risk_assessment", legal_agent.risk_assessment)
+    workflow.add_node("antitrust_checker", legal_agent.antitrust_checker)
+    workflow.add_node("legal_report", legal_agent.legal_report)
+    workflow.add_node("legal_human_approval", legal_agent.human_approval)
     
     # Define entry point and initial workflow
     workflow.set_entry_point("generate_queries")
@@ -95,12 +125,23 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
         }
     )
     
+    # Connect financial reporting to human_give_doc for legal workflow
+    workflow.add_edge("financial_reporting", "human_give_doc")
+    
+    # Legal Workflow Edges
     workflow.add_conditional_edges(
-        "financial_reporting",
-        lambda state: END,
-        {
-            END: END
-        }
+        "human_give_doc",
+        lambda state: "take_legal_document" if state.current_step == "human_approval_confirmed" else END
+    )
+    
+    workflow.add_edge("take_legal_document", "risk_assessment")
+    workflow.add_edge("risk_assessment", "antitrust_checker")
+    workflow.add_edge("antitrust_checker", "legal_report")
+    workflow.add_edge("legal_report", "legal_human_approval")
+    
+    workflow.add_conditional_edges(
+        "legal_human_approval",
+        lambda state: END if state.current_step != "human_approval_confirmed" else END
     )
     
     # Compile the graph
@@ -112,7 +153,7 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, "comprehensive_agent_graph.png")
         graph_image = compiled_graph.get_graph().draw_mermaid_png(
-            curve_style=CurveStyle.LINEAR,
+            curve_style=CurveStyle.CARDINAL ,
             node_colors=NodeStyles(first="#ffdfba", last="#baffc9", default="#fad7de"),
             wrap_label_n_words=9,
             output_file_path=None,
@@ -127,6 +168,8 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
         logger.warning(f"Could not save graph visualization: {e}")
     
     return compiled_graph
+
+# Rest of the script remains the same as in the previous version
 
 if __name__ == "__main__":
     rag_instances = {}
@@ -148,6 +191,8 @@ if __name__ == "__main__":
     initial_state = MnAagentState(
         company_a_name="Reliance_Industries_Limited",
         company_b_name="180_Degree_Consulting",
+        company_a_doc="/home/naba/Desktop/backend/RIL-Integrated-Annual-Report-2023-24_parsed.txt",
+        company_b_doc="/home/naba/Desktop/backend/dc.txt",
         rag_instances=rag_instances,
         indexes=indexes,
         retrievers=retrievers
