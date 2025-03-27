@@ -4,8 +4,9 @@ import uuid
 import os
 from typing import List, Dict, Any
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage
-from utils.chat import Chat
+# from langchain_core.messages import HumanMessage
+from utils.message import HumanMessage
+from utils.chat_test import Chat
 import yaml
 from llama_index.core import VectorStoreIndex
 from llama_index.core import Settings

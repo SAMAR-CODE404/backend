@@ -333,3 +333,15 @@ Legal_Prompt:
             ## **5. Further Investigation Required**
             - Missing or unclear information affecting the assessment.
             - Additional documents or data needed for a comprehensive evaluation.
+
+Merger_agent_prompt:
+
+      Mergebility_prompt: |
+            you're a financial analyst who is working on a Merger task for {company_a} and {company_b}.
+            Now generate separate queries about company A and company B to check their financial health and market position.
+            for example: 
+            - is from which industry?
+            - what is the revenue of company A?
+            structure the query in the following format
+            - "The company is from which industry?""
+            the overall query length should not exceed 25 words
