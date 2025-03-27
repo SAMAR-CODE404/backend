@@ -10,7 +10,8 @@ import logging
 from agents.merger_agent import MergerValuationAgent
 from RAG.rag_llama import RAG
 from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
-
+from agents.legal_agent import MergerLegalAgent
+from agents.report_agent import ReportAgentNodes
 
 # Configure logging
 logging.basicConfig(
@@ -38,7 +39,8 @@ def create_sequential_workflow(mn_agent_state: MnAagentState):
     
     # Create merger valuation agent
     merger_agent = MergerValuationAgent(mn_agent_state)
-    
+    legal_agent = MergerLegalAgent(mn_agent_state)
+    report_agent = ReportAgentNodes(mn_agent_state)
     # Define the graph workflow
     workflow = StateGraph(MnAagentState)
     
@@ -55,6 +57,11 @@ def create_sequential_workflow(mn_agent_state: MnAagentState):
     workflow.add_node("industry_positioning_a", ops_agent_a.industry_positioning)
     workflow.add_node("ops_human_approval_a", ops_agent_a.human_approval)
     workflow.add_node("operations_reporting_a", ops_agent_a.operations_reporting)
+    workflow.add_node("assess_regulatory_compliance", legal_agent.assess_regulatory_compliance)
+    workflow.add_node("conduct_legal_due_diligence", legal_agent.conduct_legal_due_diligence)
+    workflow.add_node("assess_potential_legal_risks", legal_agent.assess_potential_legal_risks)
+    workflow.add_node("finalize_legal_report", lambda state: state)
+
     
     # Company B Workflow Nodes
     workflow.add_node("generate_queries_b", research_agent_b.generate_queries)
@@ -74,6 +81,12 @@ def create_sequential_workflow(mn_agent_state: MnAagentState):
     workflow.add_node("calculate_merger_valuation", merger_agent.calculate_merger_valuation)
     workflow.add_node("assess_integration_risks", merger_agent.assess_integration_risks)
     workflow.add_node("finalize_merger_report", lambda state: state)
+    workflow.add_node("report_structure_creator", report_agent.report_structure_creator)
+    workflow.add_node("section_template_generator", report_agent.section_template_generator)
+    workflow.add_node("rag_summary_generator", report_agent.rag_summary_generator)
+    workflow.add_node("consistency_checker", report_agent.consistency_checker)
+    workflow.add_node("report_formatter", report_agent.report_formatter)
+    
     
     # Set entry point
     workflow.set_entry_point("generate_queries_a")
@@ -215,9 +228,17 @@ def create_sequential_workflow(mn_agent_state: MnAagentState):
     workflow.add_edge("validate_merger_feasibility", "calculate_merger_valuation")
     workflow.add_edge("calculate_merger_valuation", "assess_integration_risks")
     workflow.add_edge("assess_integration_risks", "finalize_merger_report")
-    
-    # Set finish point
-    workflow.set_finish_point("finalize_merger_report")
+    workflow.add_edge("finalize_merger_report", "assess_regulatory_compliance")
+    workflow.add_edge("assess_regulatory_compliance", "conduct_legal_due_diligence")
+    workflow.add_edge("conduct_legal_due_diligence", "assess_potential_legal_risks")
+    workflow.add_edge("assess_potential_legal_risks", "finalize_legal_report")
+    # Define workflow edges
+    workflow.add_edge("finalize_legal_report", "report_structure_creator")
+    workflow.add_edge("report_structure_creator", "section_template_generator")
+    workflow.add_edge("section_template_generator", "rag_summary_generator")
+    workflow.add_edge("rag_summary_generator", "consistency_checker")
+    workflow.add_edge("consistency_checker", "report_formatter")
+    workflow.add_edge("report_formatter", END)
     
     # Compile the workflow
     compiled_graph =  workflow.compile()

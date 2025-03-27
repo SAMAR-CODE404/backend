@@ -57,15 +57,28 @@ class MnAagentState(BaseModel):
     supply_chain_analyst: Dict[str, str] = Field(default_factory=dict, description="Supply chain analyst data")
     industry_position: Dict[str, str] = Field(default_factory=dict, description="Industry position data")
 
-    # Merger Details and Assessments
     merger_acquisition_details: Dict[str, Any] = Field(default_factory=dict, description="Merger and acquisition details")
     risk_check: Dict[str, Any] = Field(default_factory=dict, description="Risk assessment for each company")
     antitrust_assessment: Dict[str, Any] = Field(default_factory=dict, description="Antitrust assessment for each company")
+
+    # New fields to resolve previous errors
+    legal_docs: Dict[str, List[str]] = Field(default_factory=dict, description="Legal documents for each company")
+    merger_jurisdiction: Optional[str] = Field(default=None, description="Jurisdiction for the merger")
+    legal_check: Dict[str, str] = Field(default_factory=dict, description="Legal check results")
 
     # Error Handling
     error: Optional[str] = Field(default=None, description="Error message if any step fails")
 
     # Model Configuration
+    merger_structure: Optional[str] = Field(default=None, description="Merger structure")
+    merger_context: Optional[str] = Field(default=None, description="Additional context for the merger")
+    corporate_structure: Dict[str, Any] = Field(default_factory=dict, description="Corporate structure data")
+    litigation_history: Dict[str, Any] = Field(default_factory=dict, description="Litigation history data")
+    potential_conflicts: Dict[str, Any] = Field(default_factory=dict, description="Potential conflicts data")
+    legal_report_structure: Dict[str, Any] = Field(default_factory=dict, description="Legal report structure data")
+    consistency_issues: Dict[str, Any] = Field(default_factory=dict, description="Consistency issues data")
+    section_templates: Dict[str, Any] = Field(default_factory=dict, description="Section templates data")
+    final_report: Dict[str, Any] = Field(default_factory=dict, description="Final report structure data")
     model_config = ConfigDict(
         arbitrary_types_allowed=True,  # Allow complex types like RAG instances
         extra='ignore'  # Ignore extra fields not defined in the model

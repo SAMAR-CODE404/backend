@@ -307,10 +307,12 @@ if __name__ == "__main__":
     
     # Create initial state
     initial_state = MnAagentState(
-        company_a_name="Reliance_Industries_Limited",
-        company_b_name="180_Degree_Consulting"
-    )
-    
+    company_a_name="Reliance_Industries_Limited",
+    company_b_name="180_Degree_Consulting",
+    company_a_doc="/path/to/reliance/legal/document1.pdf",  # Provide a document path
+    company_b_doc="/path/to/180dc/legal/document1.txt"     # Provide a document path
+)
+
     # Create legal agent
     legal_agent = MergerLegalAgent(initial_state)
     
