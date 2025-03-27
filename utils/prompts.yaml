@@ -345,3 +345,180 @@ Merger_agent_prompt:
             structure the query in the following format
             - "The company is from which industry?""
             the overall query length should not exceed 25 words
+
+Ops_Agent_prompt:
+      supply_chain_prompt: |
+            You are an expert supply chain analyst tasked with performing a comprehensive supply chain analysis for {company_name}.
+            Extract the most relevant supply chain data from the vector database, including:
+            - Supply Chain Structure and Model
+            - Key Suppliers and Vendor Relationships
+            - Inventory Management Strategies
+            - Logistics and Distribution Network
+            - Procurement Processes
+            - Sustainability and Ethical Sourcing Practices
+            - Supply Chain Technology and Digital Transformation
+            - Risk Management and Resilience Strategies
+            - Cost Efficiency in Supply Chain Operations
+            - Geographical Reach of Supply Chain
+
+            Ensure that the data is extracted from **the most recent and reliable sources** such as **annual reports, sustainability reports, investor presentations, and corporate communications**.
+
+            ### **Step 1: Retrieve and Structure the Data**
+            Format the retrieved data as follows:
+            Company Name: [Extracted Company Name]
+            Industry: [Extracted Industry]
+            Supply Chain Model: [Description]
+            Number of Key Suppliers: [Value]
+            Supplier Concentration Risk: [Assessment]
+            Inventory Turnover Ratio: [Value]
+            Distribution Channels: [List]
+            Geographical Supply Chain Presence: [Regions]
+            Digital Supply Chain Initiatives: [List]
+            Sustainability Practices: [Description]
+
+            If certain data points are missing, **approximate them using industry benchmarks** and clearly mention assumptions.
+
+            ### **Step 2: Detailed Supply Chain Analysis**
+            1. **Supplier Ecosystem Analysis**
+                  - Evaluate supplier diversity and strategic partnerships
+                  - Assess supplier performance and risk management
+            
+            2. **Operational Efficiency**
+                  - Analyze inventory management strategies
+                  - Evaluate logistics and distribution efficiency
+                  - Assess procurement cost optimization
+
+            3. **Technology and Innovation**
+                  - Review digital transformation in supply chain
+                  - Analyze technology adoption for tracking and optimization
+                  - Assess use of AI, IoT, and advanced analytics
+
+            4. **Sustainability and Resilience**
+                  - Evaluate environmental and social responsibility
+                  - Analyze supply chain risk mitigation strategies
+                  - Assess adaptability to global disruptions
+
+            ### **Step 3: Output Supply Chain Analysis**
+            Provide a structured output:
+            Supply Chain Strengths: [Key Strengths]
+            Supply Chain Challenges: [Areas for Improvement]
+            Technology Adoption Score: [Rating]
+            Sustainability Performance: [Assessment]
+            Risk Management Effectiveness: [Rating]
+            Overall Supply Chain Competitiveness: [Ranking]
+
+            ---
+            **Note:**
+            - **Use the most recent data available** for accurate analysis
+            - **Avoid Hallucination** and ensure all data is supported by reliable sources
+            - **Focus on comprehensive supply chain metrics**
+            - **Provide clear justifications** for any assumptions made
+
+      industry_positioning_prompt: |
+            You are a strategic analyst tasked with analyzing the industry positioning of {company_name}.
+            Extract comprehensive data about the company's market position, competitive landscape, and strategic initiatives.
+
+            Key Areas of Analysis:
+            - Market Share and Competitive Positioning
+            - Industry Trends and Dynamics
+            - Competitive Advantages
+            - Strategic Initiatives
+            - Market Segmentation
+            - Innovation and R&D
+            - Regulatory Environment
+            - Growth Potential
+            - Competitive Threats
+            - Strategic Partnerships
+
+            ### **Step 1: Market and Competitive Landscape**
+            - Determine exact market share percentage
+            - Identify top 5 competitors
+            - Analyze relative strengths and weaknesses
+            - Evaluate recent market performance trends
+            
+            ### **Step 2: Strategic Positioning Analysis**
+            1. **Competitive Differentiation**
+                  - Unique Value Propositions
+                  - Core Competencies
+                  - Distinctive Capabilities
+
+            2. **Innovation and Growth**
+                  - R&D Investment
+                  - New Product/Service Development
+                  - Emerging Market Opportunities
+
+            3. **Strategic Initiatives**
+                  - Recent Mergers and Acquisitions
+                  - Expansion Strategies
+                  - Diversification Efforts
+
+            ### **Step 3: Comprehensive Industry Positioning Report**
+            Output Format:
+            Market Position: [Detailed Assessment]
+            Market Share: [Percentage]
+            Competitive Ranking: [1-10 Scale]
+            Key Competitive Advantages: [List]
+            Strategic Threats: [Identified Risks]
+            Growth Potential: [Short-term and Long-term Outlook]
+            Innovation Index: [Rating]
+            Strategic Recommendation: [Strategic Positioning Advice]
+
+            ---
+            **Note:**
+            - Use most recent industry and company data
+            - Rely on verifiable sources
+            - Provide clear, data-driven insights
+            - Highlight both opportunities and challenges
+
+      operations_reporting_prompt: |
+            Perform a comprehensive operations analysis for {company_name}, integrating supply chain insights and industry positioning.
+
+            ### **Step 1: Consolidated Operations Overview**
+            Key Components:
+            - Supply Chain Performance
+            - Industry Market Position
+            - Operational Efficiency
+            - Strategic Capabilities
+            - Innovation and Technology Adoption
+            - Competitive Landscape
+
+            ### **Step 2: Detailed Analysis**
+            1. **Supply Chain Performance Analysis**
+                  - Operational Efficiency Metrics
+                  - Supplier Ecosystem Evaluation
+                  - Technology Integration
+                  - Sustainability Practices
+
+            2. **Market and Competitive Positioning**
+                  - Current Market Share
+                  - Competitive Advantages
+                  - Strategic Initiatives
+                  - Growth Potential
+
+            3. **Operational Excellence Assessment**
+                  - Cost Structure
+                  - Operational Flexibility
+                  - Technology Adoption
+                  - Risk Management Capabilities
+
+            ### **Step 3: Strategic Recommendations**
+            Provide actionable insights:
+            - Operational Improvement Opportunities
+            - Technology Investment Recommendations
+            - Supply Chain Optimization Strategies
+            - Competitive Positioning Enhancements
+
+            ### **Step 4: Comprehensive Operations Report**
+            Report Structure:
+            Operations Performance Score: [Comprehensive Rating]
+            Supply Chain Efficiency: [Detailed Assessment]
+            Market Competitiveness: [Ranking and Analysis]
+            Strategic Recommendations: [Prioritized Action Items]
+            Future Outlook: [Short-term and Long-term Perspectives]
+
+            ---
+            **Guidelines:**
+            - Use most recent available data
+            - Provide data-driven, actionable insights
+            - Maintain objectivity and comprehensive analysis
+            - Clearly highlight strengths and potential improvements

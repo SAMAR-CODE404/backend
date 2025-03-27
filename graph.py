@@ -1,14 +1,14 @@
 from agents.research_agent import ResearchAgentNodes
 from agents.fin_agent import FinAgentNodes
-from agents.legal_agent import LegalAgentNodes
-# from agents.report_agent import ReportAgentNodes
+from agents.operations_agent import OpsAgentNodes
 from agents.states import MnAagentState
 from datetime import datetime
 from langgraph.graph import StateGraph, END
-from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
+from langgraph.channels.last_value import LastValue
 import os
 import logging 
 from RAG.rag_llama import RAG
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -19,141 +19,203 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-from agents.research_agent import ResearchAgentNodes
-from agents.fin_agent import FinAgentNodes
-from agents.legal_agent import LegalAgentNodes
-# from agents.report_agent import ReportAgentNodes
-from agents.states import MnAagentState
-from datetime import datetime
-from langgraph.graph import StateGraph, END
-from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
-import os
-import logging 
-from RAG.rag_llama import RAG
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler()  # Log to console
-    ]
-)
-logger = logging.getLogger(__name__)
 
-def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
+def create_sequential_workflow(mn_agent_state: MnAagentState):
     """
-    Create and compile a comprehensive workflow combining research and financial analysis
-    with guaranteed full completion of web search
+    Create and compile a sequential workflow 
+    first processing Company A, then Company B
     """
-    # Initialize agent nodes
-    research_agent = ResearchAgentNodes(mn_agent_state, company)
-    fin_agent = FinAgentNodes(mn_agent_state, company)
-    legal_agent = LegalAgentNodes(mn_agent_state, company)
+    # Initialize agent nodes for both companies
+    research_agent_a = ResearchAgentNodes(mn_agent_state, 'a')
+    fin_agent_a = FinAgentNodes(mn_agent_state, 'a')
+    ops_agent_a = OpsAgentNodes(mn_agent_state, 'a')
+    
+    research_agent_b = ResearchAgentNodes(mn_agent_state, 'b')
+    fin_agent_b = FinAgentNodes(mn_agent_state, 'b')
+    ops_agent_b = OpsAgentNodes(mn_agent_state, 'b')
     
     # Define the graph workflow
     workflow = StateGraph(MnAagentState)
     
-    # Add nodes from both workflows
-    # Research Phase Nodes
-    workflow.add_node("generate_queries", research_agent.generate_queries)
-    workflow.add_node("research_human_approval", research_agent.human_approval)
-    workflow.add_node("web_search", research_agent.web_search)
+    # Add nodes for Company A's workflow
+    workflow.add_node("generate_queries_a", research_agent_a.generate_queries)
+    workflow.add_node("research_human_approval_a", research_agent_a.human_approval)
+    workflow.add_node("web_search_a", research_agent_a.web_search)
+    workflow.add_node("DCF_modelling_a", fin_agent_a.DCF_modelling)
+    workflow.add_node("financial_ratio_a", fin_agent_a.financial_ratios)
+    workflow.add_node("fin_human_approval_a", fin_agent_a.human_approval)
+    workflow.add_node("financial_reporting_a", fin_agent_a.financial_reporting)
+    workflow.add_node("supply_chain_analysis_a", ops_agent_a.supply_chain_analysis)
+    workflow.add_node("industry_positioning_a", ops_agent_a.industry_positioning)
+    workflow.add_node("ops_human_approval_a", ops_agent_a.human_approval)
+    workflow.add_node("operations_reporting_a", ops_agent_a.operations_reporting)
     
-    # Financial Analysis Nodes
-    workflow.add_node("DCF_modelling", fin_agent.DCF_modelling)
-    workflow.add_node("financial_ratio", fin_agent.financial_ratios)
-    workflow.add_node("fin_human_approval", fin_agent.human_approval)
-    workflow.add_node("financial_reporting", fin_agent.financial_reporting)
+    # Add nodes for Company B's workflow
+    workflow.add_node("generate_queries_b", research_agent_b.generate_queries)
+    workflow.add_node("research_human_approval_b", research_agent_b.human_approval)
+    workflow.add_node("web_search_b", research_agent_b.web_search)
+    workflow.add_node("DCF_modelling_b", fin_agent_b.DCF_modelling)
+    workflow.add_node("financial_ratio_b", fin_agent_b.financial_ratios)
+    workflow.add_node("fin_human_approval_b", fin_agent_b.human_approval)
+    workflow.add_node("financial_reporting_b", fin_agent_b.financial_reporting)
+    workflow.add_node("supply_chain_analysis_b", ops_agent_b.supply_chain_analysis)
+    workflow.add_node("industry_positioning_b", ops_agent_b.industry_positioning)
+    workflow.add_node("ops_human_approval_b", ops_agent_b.human_approval)
+    workflow.add_node("operations_reporting_b", ops_agent_b.operations_reporting)
     
-    # Legal Nodes
-    workflow.add_node("human_give_doc", legal_agent.human_give_doc)
-    workflow.add_node("take_legal_document", legal_agent.take_legal_document)
-    workflow.add_node("risk_assessment", legal_agent.risk_assessment)
-    workflow.add_node("antitrust_checker", legal_agent.antitrust_checker)
-    workflow.add_node("legal_report", legal_agent.legal_report)
-    workflow.add_node("legal_human_approval", legal_agent.human_approval)
+    # Add a final combination node
+    workflow.add_node("combine_results", lambda state: state)
     
-    # Define entry point and initial workflow
-    workflow.set_entry_point("generate_queries")
+    # Set the entry point to Company A's workflow
+    workflow.set_entry_point("generate_queries_a")
     
-    # Research Phase Edges
-    workflow.add_edge("generate_queries", "research_human_approval")
+    # Define sequential workflow for Company A
+    workflow.add_edge("generate_queries_a", "research_human_approval_a")
     
     workflow.add_conditional_edges(
-        "research_human_approval",
+        "research_human_approval_a",
         lambda state: "continue_search" if state.current_step == "human_approval_confirmed" else END,
         {
-            "continue_search": "web_search",
+            "continue_search": "web_search_a",
             END: END
         }
     )
     
-    def web_search_condition(state):
-        search_result = research_agent.should_continue(state)
-        if not hasattr(state, 'search_iterations'):
-            state.search_iterations = 0
-        state.search_iterations += 1
+    def web_search_condition_a(state):
+        if not hasattr(state, 'iteration_tracker'):
+            state.iteration_tracker = {'a': 0, 'b': 0}
         
-        # Add a max recursion limit (e.g., 3 iterations)
-        if state.search_iterations >= 26:
+        state.iteration_tracker['a'] += 1
+        
+        search_result = research_agent_a.should_continue(state)
+        
+        if state.iteration_tracker['a'] >= 26:
             return "fully_completed"
         
-        if search_result == END and state.search_iterations > 0:
+        if search_result == END and state.iteration_tracker['a'] > 0:
             return "fully_completed"
         
         return search_result
 
     workflow.add_conditional_edges(
-        "web_search",
-        web_search_condition,
+        "web_search_a",
+        web_search_condition_a,
         {
-            "continue_search": "web_search",
-            "fully_completed": "DCF_modelling",
-            END: END  # Change this to prevent bypassing the workflow
-        }
-    )
-    
-    workflow.add_edge("DCF_modelling", "financial_ratio")
-    workflow.add_edge("financial_ratio", "fin_human_approval")
-    
-    workflow.add_conditional_edges(
-        "fin_human_approval",
-        lambda state: "save_report" if state.current_step == "human_approval_confirmed" else END,
-        {
-            "save_report": "financial_reporting",
+            "continue_search": "web_search_a",
+            "fully_completed": "DCF_modelling_a",
             END: END
         }
     )
     
-    # Connect financial reporting to human_give_doc for legal workflow
-    workflow.add_edge("financial_reporting", "human_give_doc")
-    
-    # Legal Workflow Edges
-    workflow.add_conditional_edges(
-        "human_give_doc",
-        lambda state: "take_legal_document" if state.current_step == "human_approval_confirmed" else END
-    )
-    
-    workflow.add_edge("take_legal_document", "risk_assessment")
-    workflow.add_edge("risk_assessment", "antitrust_checker")
-    workflow.add_edge("antitrust_checker", "legal_report")
-    workflow.add_edge("legal_report", "legal_human_approval")
+    # Financial workflow for A
+    workflow.add_edge("DCF_modelling_a", "financial_ratio_a")
+    workflow.add_edge("financial_ratio_a", "fin_human_approval_a")
     
     workflow.add_conditional_edges(
-        "legal_human_approval",
-        lambda state: END if state.current_step != "human_approval_confirmed" else END
+        "fin_human_approval_a",
+        lambda state: "save_report" if state.current_step == "human_approval_confirmed" else END,
+        {
+            "save_report": "financial_reporting_a",
+            END: END
+        }
     )
+    
+    # Operations workflow for A
+    workflow.add_edge("financial_reporting_a", "supply_chain_analysis_a")
+    workflow.add_edge("supply_chain_analysis_a", "industry_positioning_a")
+    workflow.add_edge("industry_positioning_a", "ops_human_approval_a")
+    
+    workflow.add_conditional_edges(
+        "ops_human_approval_a",
+        lambda state: "save_report" if state.current_step == "human_approval_confirmed" else END,
+        {
+            "save_report": "operations_reporting_a",
+            END: END
+        }
+    )
+    
+    # Transition from Company A to Company B workflow
+    workflow.add_edge("operations_reporting_a", "generate_queries_b")
+    
+    # Workflow for Company B (similar structure to A)
+    workflow.add_edge("generate_queries_b", "research_human_approval_b")
+    
+    workflow.add_conditional_edges(
+        "research_human_approval_b",
+        lambda state: "continue_search" if state.current_step == "human_approval_confirmed" else END,
+        {
+            "continue_search": "web_search_b",
+            END: END
+        }
+    )
+    
+    def web_search_condition_b(state):
+        if not hasattr(state, 'iteration_tracker'):
+            state.iteration_tracker = {'a': 0, 'b': 0}
+        
+        state.iteration_tracker['b'] += 1
+        
+        search_result = research_agent_b.should_continue(state)
+        
+        if state.iteration_tracker['b'] >= 26:
+            return "fully_completed"
+        
+        if search_result == END and state.iteration_tracker['b'] > 0:
+            return "fully_completed"
+        
+        return search_result
+
+    workflow.add_conditional_edges(
+        "web_search_b",
+        web_search_condition_b,
+        {
+            "continue_search": "web_search_b",
+            "fully_completed": "DCF_modelling_b",
+            END: END
+        }
+    )
+    
+    # Financial workflow for B
+    workflow.add_edge("DCF_modelling_b", "financial_ratio_b")
+    workflow.add_edge("financial_ratio_b", "fin_human_approval_b")
+    
+    workflow.add_conditional_edges(
+        "fin_human_approval_b",
+        lambda state: "save_report" if state.current_step == "human_approval_confirmed" else END,
+        {
+            "save_report": "financial_reporting_b",
+            END: END
+        }
+    )
+    
+    # Operations workflow for B
+    workflow.add_edge("financial_reporting_b", "supply_chain_analysis_b")
+    workflow.add_edge("supply_chain_analysis_b", "industry_positioning_b")
+    workflow.add_edge("industry_positioning_b", "ops_human_approval_b")
+    
+    workflow.add_conditional_edges(
+        "ops_human_approval_b",
+        lambda state: "save_report" if state.current_step == "human_approval_confirmed" else END,
+        {
+            "save_report": "operations_reporting_b",
+            END: END
+        }
+    )
+    
+    # Final combination
+    workflow.add_edge("operations_reporting_b", "combine_results")
+    
+    # Set end point
+    workflow.set_finish_point("combine_results")
     
     # Compile the graph
     compiled_graph = workflow.compile()
-    
-    # Graph visualization
     try:
         output_dir = "assets"
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, "comprehensive_agent_graph.png")
         graph_image = compiled_graph.get_graph().draw_mermaid_png(
-            curve_style=CurveStyle.CARDINAL ,
+            curve_style=CurveStyle.CARDINAL,
             node_colors=NodeStyles(first="#ffdfba", last="#baffc9", default="#fad7de"),
             wrap_label_n_words=9,
             output_file_path=None,
@@ -163,14 +225,13 @@ def create_comprehensive_workflow(mn_agent_state: MnAagentState, company: str):
         )
         with open(output_path, "wb") as f:
             f.write(graph_image)
-        logger.info(f"Graph visualization saved to {output_path}")
+            logger.info(f"Graph visualization saved to {output_path}")
     except Exception as e:
         logger.warning(f"Could not save graph visualization: {e}")
     
     return compiled_graph
 
-# Rest of the script remains the same as in the previous version
-
+# Main execution remains the same as in your original script
 if __name__ == "__main__":
     rag_instances = {}
     indexes = {}
@@ -197,5 +258,7 @@ if __name__ == "__main__":
         indexes=indexes,
         retrievers=retrievers
     )
-    research_graph = create_comprehensive_workflow(initial_state, 'a')
+    
+    # Create and invoke the sequential workflow
+    research_graph = create_sequential_workflow(initial_state)
     final_state = research_graph.invoke(initial_state, config={"recursion_limit": 1000})
