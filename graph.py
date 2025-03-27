@@ -7,7 +7,10 @@ from langgraph.graph import StateGraph, END
 from langgraph.channels.last_value import LastValue
 import os
 import logging 
+from agents.merger_agent import MergerValuationAgent
 from RAG.rag_llama import RAG
+from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
+
 
 # Configure logging
 logging.basicConfig(
@@ -22,22 +25,25 @@ logger = logging.getLogger(__name__)
 
 def create_sequential_workflow(mn_agent_state: MnAagentState):
     """
-    Create and compile a sequential workflow 
-    first processing Company A, then Company B
+    Create a comprehensive workflow for multi-company analysis and merger valuation
     """
     # Initialize agent nodes for both companies
-    research_agent_a = ResearchAgentNodes(mn_agent_state, 'a')
-    fin_agent_a = FinAgentNodes(mn_agent_state, 'a')
-    ops_agent_a = OpsAgentNodes(mn_agent_state, 'a')
+    research_agent_a = ResearchAgentNodes(mn_agent_state, 'a', approval=True)
+    fin_agent_a = FinAgentNodes(mn_agent_state, 'a', approval=True)
+    ops_agent_a = OpsAgentNodes(mn_agent_state, 'a', approval=True)
     
-    research_agent_b = ResearchAgentNodes(mn_agent_state, 'b')
-    fin_agent_b = FinAgentNodes(mn_agent_state, 'b')
-    ops_agent_b = OpsAgentNodes(mn_agent_state, 'b')
+    research_agent_b = ResearchAgentNodes(mn_agent_state, 'b', approval=True)
+    fin_agent_b = FinAgentNodes(mn_agent_state, 'b', approval=True)
+    ops_agent_b = OpsAgentNodes(mn_agent_state, 'b', approval=True)
+    
+    # Create merger valuation agent
+    merger_agent = MergerValuationAgent(mn_agent_state)
     
     # Define the graph workflow
     workflow = StateGraph(MnAagentState)
     
-    # Add nodes for Company A's workflow
+    # Add nodes for comprehensive workflow
+    # Company A Workflow Nodes
     workflow.add_node("generate_queries_a", research_agent_a.generate_queries)
     workflow.add_node("research_human_approval_a", research_agent_a.human_approval)
     workflow.add_node("web_search_a", research_agent_a.web_search)
@@ -50,7 +56,7 @@ def create_sequential_workflow(mn_agent_state: MnAagentState):
     workflow.add_node("ops_human_approval_a", ops_agent_a.human_approval)
     workflow.add_node("operations_reporting_a", ops_agent_a.operations_reporting)
     
-    # Add nodes for Company B's workflow
+    # Company B Workflow Nodes
     workflow.add_node("generate_queries_b", research_agent_b.generate_queries)
     workflow.add_node("research_human_approval_b", research_agent_b.human_approval)
     workflow.add_node("web_search_b", research_agent_b.web_search)
@@ -63,10 +69,13 @@ def create_sequential_workflow(mn_agent_state: MnAagentState):
     workflow.add_node("ops_human_approval_b", ops_agent_b.human_approval)
     workflow.add_node("operations_reporting_b", ops_agent_b.operations_reporting)
     
-    # Add a final combination node
-    workflow.add_node("combine_results", lambda state: state)
+    # Merger Valuation Nodes
+    workflow.add_node("validate_merger_feasibility", merger_agent.validate_merger_feasibility)
+    workflow.add_node("calculate_merger_valuation", merger_agent.calculate_merger_valuation)
+    workflow.add_node("assess_integration_risks", merger_agent.assess_integration_risks)
+    workflow.add_node("finalize_merger_report", lambda state: state)
     
-    # Set the entry point to Company A's workflow
+    # Set entry point
     workflow.set_entry_point("generate_queries_a")
     
     # Define sequential workflow for Company A
@@ -202,14 +211,16 @@ def create_sequential_workflow(mn_agent_state: MnAagentState):
         }
     )
     
-    # Final combination
-    workflow.add_edge("operations_reporting_b", "combine_results")
+    workflow.add_edge("operations_reporting_b", "validate_merger_feasibility")
+    workflow.add_edge("validate_merger_feasibility", "calculate_merger_valuation")
+    workflow.add_edge("calculate_merger_valuation", "assess_integration_risks")
+    workflow.add_edge("assess_integration_risks", "finalize_merger_report")
     
-    # Set end point
-    workflow.set_finish_point("combine_results")
+    # Set finish point
+    workflow.set_finish_point("finalize_merger_report")
     
-    # Compile the graph
-    compiled_graph = workflow.compile()
+    # Compile the workflow
+    compiled_graph =  workflow.compile()
     try:
         output_dir = "assets"
         os.makedirs(output_dir, exist_ok=True)

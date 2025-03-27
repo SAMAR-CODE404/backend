@@ -522,3 +522,113 @@ Ops_Agent_prompt:
             - Provide data-driven, actionable insights
             - Maintain objectivity and comprehensive analysis
             - Clearly highlight strengths and potential improvements
+
+# Prompts Configuration for Merger Valuation and Operational Analysis
+
+Merger_Valuation_Agent_Prompts:
+      merger_feasibility_prompt: |
+            Comprehensively assess the feasibility of the proposed merger between the two companies.
+            Analyze the following key aspects:
+            
+            1. Financial Compatibility
+            - Compare financial statements and key performance indicators
+            - Assess revenue synergies and potential cost savings
+            - Evaluate debt structures and financial health
+            
+            2. Strategic Alignment
+            - Analyze strategic goals and potential synergies
+            - Assess compatibility of business models
+            - Evaluate potential competitive advantages
+            
+            3. Legal and Regulatory Considerations
+            - Review potential antitrust or regulatory challenges
+            - Assess compliance requirements
+            - Identify potential legal obstacles
+            
+            4. Cultural and Operational Integration
+            - Evaluate organizational culture compatibility
+            - Assess potential integration challenges
+            - Identify key risks in merger implementation
+            
+            5. Market and Competitive Landscape
+            - Analyze impact on market positioning
+            - Assess potential market share gains
+            - Evaluate competitive response
+            
+            Provide a comprehensive recommendation on merger feasibility, 
+            including potential benefits, risks, and strategic implications.
+
+      merger_valuation_prompt: |
+            Perform a comprehensive merger valuation analysis using advanced financial techniques.
+            
+            Key Valuation Components:
+            1. Discounted Cash Flow (DCF) Analysis
+            - Integrate DCF models for both companies
+            - Assess projected future cash flows
+            - Calculate weighted average cost of capital (WACC)
+            
+            2. Comparative Valuation Methods
+            - Analyze financial ratios
+            - Compare valuation multiples (P/E, EV/EBITDA)
+            - Benchmark against industry standards
+            
+            3. Synergy Valuation
+            - Estimate potential cost synergies
+            - Evaluate revenue enhancement opportunities
+            - Calculate combined entity value
+            
+            4. Risk-Adjusted Valuation
+            - Incorporate risk premium
+            - Assess integration and operational risks
+            - Develop scenario-based valuation models
+            
+            5. Shareholder Value Analysis
+            - Estimate potential impact on shareholder value
+            - Calculate potential premium/discount
+            - Assess long-term value creation potential
+            
+            Provide a detailed valuation report with:
+            - Precise valuation range
+            - Underlying assumptions
+            - Sensitivity analysis
+            - Strategic valuation insights
+
+      integration_risks_prompt: |
+            Conduct a comprehensive assessment of potential risks in merger integration.
+            
+            Areas of Risk Analysis:
+            1. Operational Integration Risks
+            - Supply chain compatibility
+            - Technology and systems integration
+            - Process harmonization challenges
+            
+            2. Cultural and Human Capital Risks
+            - Organizational culture conflicts
+            - Talent retention and management
+            - Leadership and governance challenges
+            
+            3. Financial and Performance Risks
+            - Potential revenue disruption
+            - Cost overruns in integration
+            - Financial performance variations
+            
+            4. Strategic and Market Risks
+            - Competitive landscape changes
+            - Market perception and investor confidence
+            - Potential market share loss
+            
+            5. Regulatory and Compliance Risks
+            - Antitrust and regulatory challenges
+            - Compliance integration
+            - Legal and contractual risks
+            
+            Assessment Methodology:
+            - Quantitative risk scoring
+            - Scenario-based risk modeling
+            - Mitigation strategy development
+            
+            Provide a comprehensive risk assessment with:
+            - Detailed risk identification
+            - Probability and impact analysis
+            - Recommended mitigation strategies
+            - Potential long-term risk implications

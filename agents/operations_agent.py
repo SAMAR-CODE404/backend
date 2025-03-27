@@ -20,7 +20,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class OpsAgentNodes:
-    def __init__(self, state: MnAagentState, company: str):
+    def __init__(self, state: MnAagentState, company: str, approval: bool):
+
         """
         Initialize Operations Agent for a specific company
         
@@ -28,6 +29,7 @@ class OpsAgentNodes:
             state (MnAagentState): The current state of the multi-agent system
             company (str): Identifier for the company ('a' or 'b')
         """
+        self.approval = approval
         self.state = state
         if company == 'a':
             self.company_name = state.company_a_name
@@ -145,9 +147,9 @@ class OpsAgentNodes:
         Returns:
             MnAagentState: Updated state based on human approval
         """
-        proceed = input("\nDo you want to proceed with the operations report? (yes/no): ").lower().strip()
+        proceed = self.approval
         
-        if proceed == 'yes':
+        if proceed == 1:
             state.current_step = "human_approval_confirmed"
             return state
         
