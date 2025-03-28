@@ -81,7 +81,7 @@ class FinAgentNodes:
             os.makedirs(output_dir, exist_ok=True)
             output_path = os.path.join(output_dir, f"{self.company_name}_financial_report.txt")
             
-            with open(output_path, "w") as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 f.write(response["result"])
             
             return state

@@ -254,7 +254,7 @@ class MergerLegalAgent:
             os.makedirs(output_dir, exist_ok=True)
             legal_risks_report_path = os.path.join(output_dir, "legal_risks_report.txt")
             
-            with open(legal_risks_report_path, "w") as f:
+            with open(legal_risks_report_path, "w", encoding="utf-8") as f:
                 f.write(risk_response['result'])
             
             state.merger_report = legal_risks_report_path

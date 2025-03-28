@@ -16,3 +16,4 @@ chromadb
 sentence-transformers
 pyMuPDF
 pytesseract
+streamlit
