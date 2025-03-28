@@ -5,6 +5,8 @@ from typing import Dict, Any, List
 from RAG.rag_llama import RAG
 from langgraph.graph import StateGraph, END
 from agents.states import MnAagentState
+import PyPDF2
+import docx
 
 logger = logging.getLogger(__name__)
 
