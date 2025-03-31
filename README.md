@@ -29,3 +29,18 @@ To set up and run the project locally, follow these steps:
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/SAMAR-CODE404/backend.git
+2. **Navigate to the project directory**:
+   ```bash
+   cd backend
+3. **Install the required dependencies**:
+   ```bash
+   pip install -r requirements.txt
+4. **Run the application**:
+   ```bash
+   python Main.py
+## License
+
+This project is licensed under the Apache-2.0 License. See the [LICENSE](https://github.com/SAMAR-CODE404/backend/blob/main/LICENSE) file for more details.
+
+Note: For more information or to contribute to the project, please visit the [repository](https://github.com/SAMAR-CODE404/backend/tree/main) on GitHub.
+
